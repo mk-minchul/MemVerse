@@ -88,18 +88,47 @@ class MainWindow(QtGui.QWidget):
 
     def initUI(self):
 
+        tophbox = QtGui.QHBoxLayout()
+        self.selectAllBt = QtGui.QPushButton("All")
+        self.selectAllBt.setCheckable(True)
+        self.selectAllBt.clicked.connect(self.allBtClicked)
+        self.ABt = QtGui.QPushButton("A")
+        self.ABt.setCheckable(True)
+        self.ABt.clicked.connect(self.ABtClicked)
+        self.BBt = QtGui.QPushButton("B")
+        self.BBt.setCheckable(True)
+        self.BBt.clicked.connect(self.BBtClicked)
+        self.CBt = QtGui.QPushButton("C")
+        self.CBt.setCheckable(True)
+        self.CBt.clicked.connect(self.CBtClicked)
+        self.DBt = QtGui.QPushButton("D")
+        self.DBt.setCheckable(True)
+        self.DBt.clicked.connect(self.DBtClicked)
+        self.EBt = QtGui.QPushButton("E")
+        self.EBt.setCheckable(True)
+        self.EBt.clicked.connect(self.EBtClicked)
+        tophbox.addWidget(self.selectAllBt)
+        tophbox.addWidget(self.ABt)
+        tophbox.addWidget(self.BBt)
+        tophbox.addWidget(self.CBt)
+        tophbox.addWidget(self.DBt)
+        tophbox.addWidget(self.EBt)
+
 
         grid = QtGui.QGridLayout()
 
-        positions = [(i, j) for i in range(10) for j in range(6)]
+        positions = [(j, i) for i in range(5) for j in range(12)]
         self.checkbox_state = []
         k = 0
+        self.checks_list = []
         for i, j in positions:
             cb = QtGui.QCheckBox(VERSENAME[k], self)
             #cb.toggle()
             cb.stateChanged.connect(partial( self.check_pressed, cb))
             grid.addWidget(cb, i,j)
+            self.checks_list.append(cb)
             k += 1
+
 
         self.verseSelector = 0
         self.verseAddress = QtGui.QLabel(u"요한복음 3장 18절")
@@ -114,6 +143,7 @@ class MainWindow(QtGui.QWidget):
         QtCore.QObject.connect(self.writeVerse, QtCore.SIGNAL("textChanged()"), self.text_changed)
 
         vbox = QtGui.QVBoxLayout()
+        vbox.addLayout(tophbox)
         vbox.addLayout(grid)
         vbox.addWidget(self.verseAddress)
         vbox.addWidget(self.currentAddress)
@@ -133,7 +163,7 @@ class MainWindow(QtGui.QWidget):
         self.setLayout(vbox)
 
 
-        self.setGeometry(300, 300, 350, 300)
+        self.setGeometry(100, 100, 550, 600)
         self.setWindowTitle("MemVerse")
         self.show()
 
@@ -207,6 +237,51 @@ class MainWindow(QtGui.QWidget):
             self.hintLabel.hide()
         else:
             self.hintLabel.show()
+
+    def allBtClicked(self):
+        if self.selectAllBt.isChecked() == True:
+            for cb in self.checks_list:
+                cb.setChecked(True)
+        else:
+            for cb in self.checks_list:
+                cb.setChecked(False)
+
+    def ABtClicked(self):
+        if self.ABt.isChecked() == True:
+            for cb in self.checks_list[0:12]:
+                cb.setChecked(True)
+        else:
+            for cb in self.checks_list[0:12]:
+                cb.setChecked(False)
+    def BBtClicked(self):
+        if self.BBt.isChecked() == True:
+            for cb in self.checks_list[12:24]:
+                cb.setChecked(True)
+        else:
+            for cb in self.checks_list[12:24]:
+                cb.setChecked(False)
+    def CBtClicked(self):
+        if self.CBt.isChecked() == True:
+            for cb in self.checks_list[24:36]:
+                cb.setChecked(True)
+        else:
+            for cb in self.checks_list[24:36]:
+                cb.setChecked(False)
+    def DBtClicked(self):
+        if self.DBt.isChecked() == True:
+            for cb in self.checks_list[36:48]:
+                cb.setChecked(True)
+        else:
+            for cb in self.checks_list[36:48]:
+                cb.setChecked(False)
+    def EBtClicked(self):
+        if self.EBt.isChecked() == True:
+            for cb in self.checks_list[48:60]:
+                cb.setChecked(True)
+        else:
+            for cb in self.checks_list[48:60]:
+                cb.setChecked(False)
+
 if __name__ == "__main__":
 
     app = QtGui.QApplication(sys.argv)
