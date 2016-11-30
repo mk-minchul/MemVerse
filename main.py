@@ -193,7 +193,7 @@ class MainWindow(QtGui.QWidget):
         self.copiedVerse.setText(right + "<font style='color: red;'>" + wrong +"</font>")
 
         if compare_text == "ThyWill":
-            self.copiedVerse.setText("<font style='color: blue;'>" + u'with love' + "</font>")
+            self.copiedVerse.setText("<font style='color: blue;'>" + u'Thy Will' + "</font>")
 
 
     def check_pressed(self,cb, state):
