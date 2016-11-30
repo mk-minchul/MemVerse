@@ -134,7 +134,7 @@ class MainWindow(QtGui.QWidget):
         self.verseAddress = QtGui.QLabel(u"요한복음 3장 18절")
         self.currentAddress = QtGui.QLabel(u"")
         self.verseAddress.setWordWrap(True)
-        self.verseAnswer = u"자녀들아, 우리가 말과 혀로만 사랑하지 말고 행함과 진실함으로 하자."
+        self.verseAnswer = u"자녀들아 우리가 말과 혀로만 사랑하지 말고 행함과 진실함으로 하자."
         self.hintLabel = QtGui.QLabel(u"")
         self.hintLabel.setWordWrap(True)
         self.copiedVerse = QtGui.QLabel(u'성경구절')
@@ -164,7 +164,7 @@ class MainWindow(QtGui.QWidget):
 
 
         self.setGeometry(100, 100, 550, 600)
-        self.setWindowTitle("MemVerse")
+        self.setWindowTitle(u"사랑의교회 제자반 60구절 암송")
         self.show()
 
     def text_changed(self):
@@ -191,6 +191,10 @@ class MainWindow(QtGui.QWidget):
             right = text[0:i+space]
             wrong = text[i+space:]
         self.copiedVerse.setText(right + "<font style='color: red;'>" + wrong +"</font>")
+
+        if compare_text == "ThyWill":
+            self.copiedVerse.setText("<font style='color: blue;'>" + u'with love' + "</font>")
+
 
     def check_pressed(self,cb, state):
         if state == QtCore.Qt.Checked:
