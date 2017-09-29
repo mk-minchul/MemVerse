@@ -1,0 +1,1 @@
+([('main', '/Users/mk/GitHub/MemVerse/dist/main', 'EXECUTABLE')],)

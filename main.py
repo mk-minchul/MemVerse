@@ -1,8 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import sys
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+import re
+from PyQt5 import QtCore
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QApplication, QMainWindow, QShortcut, QLabel, QPushButton, QTextEdit, QMenu, QVBoxLayout, QHBoxLayout, QMessageBox, QWidget,QGridLayout, QCheckBox, QInputDialog, QLineEdit
+
 from functools import partial
 
 VERSENAME = [u'고후5:17',u'갈2:20',u'롬12:1',u'요14:21',u'딤후3:16',u'수1:8',
@@ -14,7 +17,7 @@ VERSENAME = [u'고후5:17',u'갈2:20',u'롬12:1',u'요14:21',u'딤후3:16',u'수
              u'마6:33',u'눅9:23',u'요일2:15,16',u'롬12:2',u'고전15:58',u'히12:3',
              u'막10:45',u'고후4:5',u'잠3:9,10',u'고후9:6,7',u'행1:8',u'마28:19,20',
              u'요13:34,35',u'요일3:18',u'빌2:3,4',u'벧전5:5,6',u'엡5:3',u'벧전2:11',
-             u'레19:11',u'행24:16',u'히11:6',u'롬4:20,21',u'갈6:9,10',u'마5:16']
+             u'레19:11',u'행24:16',u'히11:6',u'롬4:20,21',u'갈6:9,10',u'마5:16', u"custom"]
 
 VERSE = [
 u'그런즉 누구든지 그리스도 안에 있으면 새로운 피조물이라 이전 것은 지나갔으니 보라 새 것이 되었도다',
@@ -24,7 +27,7 @@ u'나의 계명을 지키는 자라야 나를 사랑하는 자니 나를 사랑�
 u'모든 성경은 하나님의 감동으로 된 것으로 교훈과 책망과 바르게 함과 의로 교육하기에 유익하니',
 u'이 율법책을 네 입에서 떠나지 말게 하며 주야로 그것을 묵상하여 그 안에 기록된 대로 다 지켜 행하라 그리하면 네 길이 평탄하게 될 것이며 네가 형통하리라',
 u'너희가 내 안에 거하고 내 말이 너희 안에 거하면 무엇이든지 원하는 대로 구하라 그리하면 이루리라',
-u'아무 것도 염려하지 말고 다만 모든 일에 기도와 간구로, 너희 구할 것을 감사함으로 하나님께 아뢰라 그리하면 모든 지각에 뛰어난 하나님의 평강이 그리스도 예수 안에서 너희 마음과 생각을 지키시리라',
+u'아무 것도 염려하지 말고 다만 모든 일에 기도와 간구로 너희 구할 것을 감사함으로 하나님께 아뢰라 그리하면 모든 지각에 뛰어난 하나님의 평강이 그리스도 예수 안에서 너희 마음과 생각을 지키시리라',
 u'두세 사람이 내 이름으로 모인 곳에는 나도 그들 중에 있느니라',
 u'서로 돌아보아 사랑과 선행을 격려하며 모이기를 폐하는 어떤 사람들의 습관과 같이 하지 말고 오직 권하여 그 날이 가까움을 볼수록 더욱 그리하자',
 u'말씀하시되 나를 따라오라 내가 너희를 사람을 낚는 어부가 되게 하리라 하시니',
@@ -76,36 +79,61 @@ u'이것으로 말미암아 나도 하나님과 사람에 대하여 항상 양�
 u'믿음이 없이는 하나님을 기쁘시게 하지 못하나니 하나님께 나아가는 자는 반드시 그가 계신 것과 또한 그가 자기를 찾는 자들에게 상 주시는 이심을 믿어야 할지니라',
 u'믿음이 없어 하나님의 약속을 의심하지 않고 믿음으로 견고하여져서 하나님께 영광을 돌리며 약속하신 그것을 또한 능히 이루실 줄을 확신하였으니',
 u'우리가 선을 행하되 낙심하지 말지니 포기하지 아니하면 때가 이르매 거두리라 그러므로 우리는 기회 있는 대로 모든 이에게 착한 일을 하되 더욱 믿음의 가정들에게 할지니라',
-u'이같이 너희 빛이 사람 앞에 비치게 하여 그들로 너희 착한 행실을 보고 하늘에 계신 너희 아버지께 영광을 돌리게 하라']
-
-print len(VERSE)
-
+u'이같이 너희 빛이 사람 앞에 비치게 하여 그들로 너희 착한 행실을 보고 하늘에 계신 너희 아버지께 영광을 돌리게 하라',
+u'custom']
 
 
-class MainWindow(QtGui.QWidget):
+
+
+class MainWindow(QMainWindow):
     def __init__(self):
-        super(MainWindow, self).__init__()
+        QMainWindow.__init__(self)
         self.initUI()
 
     def initUI(self):
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self.setWindowTitle("application main window")
 
-        tophbox = QtGui.QHBoxLayout()
-        self.selectAllBt = QtGui.QPushButton("All")
+        # 1. setting the menu bar
+
+        menubar = self.menuBar()
+        menubar.setNativeMenuBar(False)
+
+        self.file_menu = QMenu('&File', self)
+        self.file_menu.addAction('&Quit', self.fileQuit,
+                QtCore.Qt.CTRL + QtCore.Qt.Key_Q)
+        self.menuBar().addMenu(self.file_menu)
+
+        self.help_menu = QMenu('&Help', self)
+        self.menuBar().addSeparator()
+        self.menuBar().addMenu(self.help_menu)
+
+        self.help_menu.addAction('&About', self.about)
+
+        ######### 2. main widget   #######
+
+        # 2.1 main grid layout is Vbox
+        self.main_widget = QWidget(self)
+        vbox = QVBoxLayout(self.main_widget)
+
+        # 2.2 top box (abcde buttons)
+        tophbox = QHBoxLayout()
+        self.selectAllBt = QPushButton("All")
         self.selectAllBt.setCheckable(True)
         self.selectAllBt.clicked.connect(self.allBtClicked)
-        self.ABt = QtGui.QPushButton("A")
+        self.ABt = QPushButton("A")
         self.ABt.setCheckable(True)
         self.ABt.clicked.connect(self.ABtClicked)
-        self.BBt = QtGui.QPushButton("B")
+        self.BBt = QPushButton("B")
         self.BBt.setCheckable(True)
         self.BBt.clicked.connect(self.BBtClicked)
-        self.CBt = QtGui.QPushButton("C")
+        self.CBt = QPushButton("C")
         self.CBt.setCheckable(True)
         self.CBt.clicked.connect(self.CBtClicked)
-        self.DBt = QtGui.QPushButton("D")
+        self.DBt = QPushButton("D")
         self.DBt.setCheckable(True)
         self.DBt.clicked.connect(self.DBtClicked)
-        self.EBt = QtGui.QPushButton("E")
+        self.EBt = QPushButton("E")
         self.EBt.setCheckable(True)
         self.EBt.clicked.connect(self.EBtClicked)
         tophbox.addWidget(self.selectAllBt)
@@ -115,35 +143,60 @@ class MainWindow(QtGui.QWidget):
         tophbox.addWidget(self.DBt)
         tophbox.addWidget(self.EBt)
 
-
-        grid = QtGui.QGridLayout()
+        # 2.3 check box layout is grid
+        grid = QGridLayout()
 
         positions = [(j, i) for i in range(5) for j in range(12)]
         self.checkbox_state = []
         k = 0
         self.checks_list = []
         for i, j in positions:
-            cb = QtGui.QCheckBox(VERSENAME[k], self)
+            cb = QCheckBox(VERSENAME[k], self)
             #cb.toggle()
             cb.stateChanged.connect(partial( self.check_pressed, cb))
             grid.addWidget(cb, i,j)
             self.checks_list.append(cb)
             k += 1
 
+        # custom checkbox
+        cb = QCheckBox(VERSENAME[k], self)
+        cb.stateChanged.connect(partial( self.check_pressed, cb))
+        grid.addWidget(cb, 12,0)
+        self.checks_list.append(cb)
 
+        #custom text button
+        self.customBt = QPushButton(u"set text")
+        self.customBt.clicked.connect(self.showDialog)
+        grid.addWidget(self.customBt, 12,1)
+
+        #2.4 text area
         self.verseSelector = 0
-        self.verseAddress = QtGui.QLabel(u"요한복음 3장 18절")
-        self.currentAddress = QtGui.QLabel(u"")
+        self.verseAddress = QLabel(u"요한복음 3장 18절")
+        self.currentAddress = QLabel(u"")
         self.verseAddress.setWordWrap(True)
         self.verseAnswer = u"자녀들아 우리가 말과 혀로만 사랑하지 말고 행함과 진실함으로 하자."
-        self.hintLabel = QtGui.QLabel(u"")
+        self.hintLabel = QLabel(u"")
         self.hintLabel.setWordWrap(True)
-        self.copiedVerse = QtGui.QLabel(u'성경구절')
+        self.copiedVerse = QLabel(u'성경구절')
         self.copiedVerse.setWordWrap(True)
-        self.writeVerse = QtGui.QTextEdit()
-        QtCore.QObject.connect(self.writeVerse, QtCore.SIGNAL("textChanged()"), self.text_changed)
+        self.writeVerse = QTextEdit()
+        self.writeVerse.textChanged.connect(self.text_changed)
 
-        vbox = QtGui.QVBoxLayout()
+        # 2.5 button area
+        hbox = QHBoxLayout()
+        self.nextBt = QPushButton("next \n ctrl+f")
+        self.nextBt.clicked.connect(self.nextBtClicked)
+        self.hintBt = QPushButton(u"답 가리기 \n ctrl+s")
+        self.hintBt.clicked.connect(self.hintClicked)
+        self.colorBt = QPushButton(u"색 가리기 \n ctrl_d")
+        self.colorBt.clicked.connect(self.instantCheckClicked)
+        self.instantCheck = True
+        hbox.addWidget(self.nextBt)
+        hbox.addWidget(self.hintBt)
+        hbox.addWidget(self.colorBt)
+
+
+        # 2.6 adding everything to main layout
         vbox.addLayout(tophbox)
         vbox.addLayout(grid)
         vbox.addWidget(self.verseAddress)
@@ -151,62 +204,70 @@ class MainWindow(QtGui.QWidget):
         vbox.addWidget(self.hintLabel)
         vbox.addWidget(self.copiedVerse)
         vbox.addWidget(self.writeVerse)
-
-        hbox = QtGui.QHBoxLayout()
-        self.nextBt = QtGui.QPushButton("next")
-        self.nextBt.clicked.connect(self.nextBtClicked)
-        self.hintBt = QtGui.QPushButton(u"가리기")
-        self.hintBt.clicked.connect(self.hintClicked)
-        hbox.addWidget(self.nextBt)
-        hbox.addWidget(self.hintBt)
         vbox.addLayout(hbox)
 
-        self.setLayout(vbox)
 
-
+        self.main_widget.setFocus()
+        self.setCentralWidget(self.main_widget)
         self.setGeometry(100, 100, 550, 600)
         self.setWindowTitle(u"사랑의교회 제자반 60구절 암송")
         self.show()
 
+        # add shortcuts
+        self.next_shortcut = QShortcut(QKeySequence("Ctrl+f"), self)
+        self.next_shortcut.activated.connect(self.nextBtClicked)
+        self.instant_shortcut = QShortcut(QKeySequence("Ctrl+d"), self)
+        self.instant_shortcut.activated.connect(self.instantCheckClicked)
+        self.show_shortcut = QShortcut(QKeySequence("Ctrl+s"), self)
+        self.show_shortcut.activated.connect(self.hintClicked)
+
+
+    def showDialog(self):
+        
+        text, ok = QInputDialog.getText(self, 'Input Dialog', 
+            'Enter your name:')
+        try:
+            regex = re.compile('[^a-zA-Z ]+')
+            text = regex.sub('', text)
+        except:
+            pass
+        if ok:
+            VERSE[60] =str(text)
+
     def text_changed(self):
-        text = unicode(self.writeVerse.toPlainText() )
-        compare_text = text.replace(" ", "")
-        compare_answer = self.verseAnswer
-        compare_answer = compare_answer.replace(" ", "")
-        if compare_text == compare_answer[:len(compare_text)]:
-            right = text
-            wrong = ""
+        if self.instantCheck == True:
+            right, wrong = check_answer(self.writeVerse.toPlainText(), self.verseAnswer)
+            self.copiedVerse.setText("<font style='color: green;'>" + right + "</font>" + "<font style='color: red;'>" + wrong + "</font>")
+
+            if self.writeVerse.toPlainText() == "Thy Will":
+                self.copiedVerse.setText("<font style='color: blue;'>" + u'Thy Will' + "</font>")
         else:
-            i = 0
-            if len(compare_text) > len(compare_answer):
-                i = len(compare_answer)
-            else:
-                while compare_text[i] == compare_answer[i]:
-                    i += 1
-            #calculate empty spaces. This is necessary because we don't
-            #take empty space into account when we are comparing right and wrong
-            space = sum( c.isspace() for c in text[:len(compare_text)] )
-            space = sum(c.isspace() for c in text[:len(compare_text)+space])
-            if i + space > len(text):
-                space = len(text) - i
-            right = text[0:i+space]
-            wrong = text[i+space:]
-        self.copiedVerse.setText(right + "<font style='color: red;'>" + wrong +"</font>")
-
-        if compare_text == "ThyWill":
-            self.copiedVerse.setText("<font style='color: blue;'>" + u'Thy Will' + "</font>")
-
+            text = unicode(self.writeVerse.toPlainText())
+            self.copiedVerse.setText(text)
 
     def check_pressed(self,cb, state):
         if state == QtCore.Qt.Checked:
-            self.checkbox_state.append( unicode(cb.text()) )
-            address_list = ', '.join(self.checkbox_state)
-            self.verseAddress.setText(unicode(address_list))
+
+            if unicode(cb.text()) in self.checkbox_state:
+                pass
+            else:
+                self.checkbox_state.append( unicode(cb.text()) )
+                address_list = ', '.join(self.checkbox_state)
+                self.verseAddress.setText(unicode(address_list))
 
             if len(self.checkbox_state) > 0:
-                self.currentAddress.setText(u'현재구절: ' + self.checkbox_state[self.verseSelector])
-                self.verseAnswer = VERSE[VERSENAME.index(self.checkbox_state[self.verseSelector])]
-                self.hintLabel.setText(self.verseAnswer)
+                # verseselector could be bigger than 0 
+                # if so, when all checkbox is cleared, it could be a problem. 
+                # so in that case make verseselector number to be 0
+                try: 
+                    self.currentAddress.setText(u'현재구절: ' + self.checkbox_state[self.verseSelector])
+                    self.verseAnswer = VERSE[VERSENAME.index(self.checkbox_state[self.verseSelector])]
+                    self.hintLabel.setText(self.verseAnswer)
+                except:
+                    self.verseSelector = 0
+                    self.currentAddress.setText(u'현재구절: ' + self.checkbox_state[self.verseSelector])
+                    self.verseAnswer = VERSE[VERSENAME.index(self.checkbox_state[self.verseSelector])]
+                    self.hintLabel.setText(self.verseAnswer)
             else:
                 self.currentAddress.setText( u"")
         else:
@@ -222,7 +283,7 @@ class MainWindow(QtGui.QWidget):
                 else:
                     self.currentAddress.setText( u"")
             except:
-                print ""
+                pass
 
     def nextBtClicked(self):
         if len(self.checkbox_state) == 0:
@@ -236,12 +297,29 @@ class MainWindow(QtGui.QWidget):
         self.writeVerse.setText(u"")
         self.hintLabel.setText(self.verseAnswer)
 
+    def instantCheckClicked(self):
+        if self.instantCheck == False:
+            self.instantCheck = True
+            self.colorBt.setText(u"색 가리기 \n ctrl+d")
+            right, wrong = check_answer(self.writeVerse.toPlainText(), self.verseAnswer)
+            self.copiedVerse.setText(
+                "<font style='color: green;'>" + right + "</font>" + "<font style='color: red;'>" + wrong + "</font>")
+
+            if self.writeVerse.toPlainText() == "Thy Will":
+                self.copiedVerse.setText("<font style='color: blue;'>" + u'Thy Will' + "</font>")
+        else:
+            self.instantCheck = False
+            self.colorBt.setText(u"색 보이기 \n ctrl+d")
+            text = unicode(self.writeVerse.toPlainText())
+            self.copiedVerse.setText(text)
 
     def hintClicked(self):
         if self.hintLabel.isHidden() == False:
             self.hintLabel.hide()
+            self.hintBt.setText(u"답 보이기 \n ctrl+s")
         else:
             self.hintLabel.show()
+            self.hintBt.setText(u"답 가리기 \n ctrl+s")
 
     def allBtClicked(self):
         if self.selectAllBt.isChecked() == True:
@@ -287,9 +365,60 @@ class MainWindow(QtGui.QWidget):
             for cb in self.checks_list[48:60]:
                 cb.setChecked(False)
 
+
+
+
+    def fileQuit(self):
+        self.close()
+
+    def closeEvent(self, ce):
+        self.fileQuit()
+
+    def about(self):
+        QMessageBox.about(self, "About",u"""copyright 2017 예수사람.""")
+
+
+def to_unicode(unicode_or_str):
+    if isinstance(unicode_or_str, str):
+        value = unicode_or_str.decode("utf-8")
+    else:
+        value = unicode_or_str
+    return value
+
+
+def check_answer(myanswer, answer):
+    text = to_unicode(myanswer)
+    compare_answer = to_unicode(answer)
+    compare_answer = compare_answer.replace(u" ", u"")
+
+    compare_text = text.replace(u" ", u"")
+    compare_text = compare_text.replace(u",", u"")
+    compare_text = compare_text.replace(u".", u"")
+
+    if compare_text == compare_answer[:len(compare_text)]:
+        # the answer is plain right!
+        right = text
+        wrong = ""
+    else:
+        index = 0
+        result = 0
+        for i, c in enumerate(text):
+            if c in [u",", u".", u" "]:
+                pass
+            else:
+                if c == compare_answer[index]:
+                    index += 1
+                else:
+                    result = i
+                    break
+
+        right = text[:result]
+        wrong = text[result:]
+    return right, wrong
+
 if __name__ == "__main__":
 
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     myWindow = MainWindow()
     myWindow.show()
     app.exec_()

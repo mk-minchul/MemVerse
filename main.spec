@@ -4,9 +4,9 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['/Users/MK/GitHub/MemVerse'],
-             binaries=None,
-             datas=None,
+             pathex=['/Users/mk/GitHub/MemVerse'],
+             binaries=[],
+             datas=[],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
@@ -25,4 +25,8 @@ exe = EXE(pyz,
           debug=False,
           strip=False,
           upx=True,
-          console=True )
+          console=False , icon='logo.ico')
+app = BUNDLE(exe,
+             name='main.app',
+             icon='logo.ico',
+             bundle_identifier=None)
