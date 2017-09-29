@@ -1,4 +1,10 @@
 how I distributed
 
 1. MacOS:
-pyinstaller --onefile --windowed --icon=logo.ico main.py
+pyinstaller --onefile --windowed --icon=logo.icns main.py
+
+2. Windows
+pyinstaller —windowed main.py
+
+and I copied platforms folder from C:\Users\mk\Anaconda2\Library\plugins
+and pasted into the main folder in the dist folder. 

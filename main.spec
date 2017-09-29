@@ -25,8 +25,8 @@ exe = EXE(pyz,
           debug=False,
           strip=False,
           upx=True,
-          console=False , icon='logo.ico')
+          console=False , icon='logo.icns')
 app = BUNDLE(exe,
              name='main.app',
-             icon='logo.ico',
+             icon='logo.icns',
              bundle_identifier=None)

@@ -226,13 +226,16 @@ class MainWindow(QMainWindow):
         
         text, ok = QInputDialog.getText(self, 'Input Dialog', 
             'Enter your name:')
+
         try:
-            regex = re.compile('[^a-zA-Z ]+')
-            text = regex.sub('', text)
+            text = text.replace(u",", u"")
+            text = text.replace(u".", u"")
+
         except:
+            print "unicode error"
             pass
         if ok:
-            VERSE[60] =str(text)
+            VERSE[60] =text
 
     def text_changed(self):
         if self.instantCheck == True:

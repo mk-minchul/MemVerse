@@ -14,7 +14,7 @@
 <key>CFBundleDisplayName</key>
 <string>main</string>
 <key>CFBundleIconFile</key>
-<string>logo.ico</string>
+<string>logo.icns</string>
 <key>CFBundlePackageType</key>
 <string>APPL</string>
 <key>LSBackgroundOnly</key>

@@ -2,7 +2,7 @@
  False,
  False,
  False,
- 'logo.ico',
+ 'logo.icns',
  None,
  False,
  False,
@@ -230,7 +230,7 @@
  [],
  False,
  False,
- 1506654503,
+ 1506672737,
  [('runw',
    '/Users/mk/anaconda/lib/python2.7/site-packages/PyInstaller/bootloader/Darwin-64bit/runw',
    'EXECUTABLE')])
