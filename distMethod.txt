@@ -1,0 +1,4 @@
+how I distributed
+
+1. MacOS:
+pyinstaller --onefile --windowed --icon=logo.ico main.py
